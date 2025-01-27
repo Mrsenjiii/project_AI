@@ -5,16 +5,13 @@ from collections import defaultdict
 
 app = Flask(__name__)
 
-# File Path to JSONL
 path = r'english-Verified_transcripts_pdfs_txt_files_train_manifest (1).jsonl'
 
-# Function to dynamically read JSONL file
 def read_jsonl():
     with open(path, 'r') as json_file:
         return [json.loads(line) for line in json_file]  # Parse each line as JSON
 
 
-# Compute Metadata for Dashboard
 @app.route('/meta_data_analysis', methods=['GET'])
 def meta_data():
     data = read_jsonl()  # Read the latest data from file
@@ -40,7 +37,6 @@ def meta_data():
     })
 
 
-# File Statistics (For Histograms)
 @app.route('/files_analysis', methods=['GET'])
 def files_analysis():
     data = read_jsonl()  # Read the latest data from file
@@ -53,7 +49,6 @@ def files_analysis():
         numbers_chars = len(item['text'])
         number_words = len(item['text'].split())
 
-        # Add data to the response
         file_data = {
             "file_name": file_name,
             "duration": duration,
@@ -62,7 +57,6 @@ def files_analysis():
         }
         answer.append(file_data)
 
-        # Group by minute buckets
         minute = math.floor(duration / 60)  # Calculate the minute bucket
         minute_buckets[minute]["words"] += number_words
         minute_buckets[minute]["chars"] += numbers_chars
