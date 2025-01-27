@@ -1,0 +1,14 @@
+ngrok authtoken 2sBHWdUrN7KCfRe42icr14CxgmG_7F5ahyEwZzkMzeXByQVwq
+
+
+http://127.0.0.1:5000
+ngrok http http://127.0.0.1:5000
+
+
+
+
+
+python -m venv myenv
+.\myenv\Scripts\activate
+pip install -r requirements.txt
+python app.py
