@@ -8,14 +8,16 @@ app = Flask(__name__)
 # File Path to JSONL
 path = r'english-Verified_transcripts_pdfs_txt_files_train_manifest (1).jsonl'
 
-# Read the JSON Lines file
-with open(path, 'r') as json_file:
-    data = [json.loads(line) for line in json_file]  # Parse each line as JSON
+# Function to dynamically read JSONL file
+def read_jsonl():
+    with open(path, 'r') as json_file:
+        return [json.loads(line) for line in json_file]  # Parse each line as JSON
 
 
 # Compute Metadata for Dashboard
 @app.route('/meta_data_analysis', methods=['GET'])
 def meta_data():
+    data = read_jsonl()  # Read the latest data from file
     total_words = 0
     char_used = set()
     total_duration = 0
@@ -41,6 +43,7 @@ def meta_data():
 # File Statistics (For Histograms)
 @app.route('/files_analysis', methods=['GET'])
 def files_analysis():
+    data = read_jsonl()  # Read the latest data from file
     answer = []
     minute_buckets = defaultdict(lambda: {"words": 0, "chars": 0})  # Group by minutes
 
@@ -74,11 +77,20 @@ def files_analysis():
     return jsonify({"file_data": answer, "minute_buckets": minute_buckets_data})
 
 
+
+
 # Serve the Dashboard
 @app.route('/')
 def index():
     return render_template('dashboard.html')  # Renders the HTML dashboard
 
+
+@app.after_request
+def add_header(response):
+    response.headers["Cache-Control"] = "no-store, must-revalidate"
+    response.headers["Pragma"] = "no-cache"
+    response.headers["Expires"] = "0"
+    return response
 
 if __name__ == "__main__":
     app.run(debug=True, port=5000)
